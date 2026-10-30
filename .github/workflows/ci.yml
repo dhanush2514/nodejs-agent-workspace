@@ -1,0 +1,47 @@
+name: Generator quality
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  generator:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: "24.22.2"
+          cache: npm
+      - run: npm ci
+      - run: npm run check
+        env:
+          COVERAGE_DIRECTORY: ${{ runner.temp }}/generator-coverage
+      - run: npm run format:check
+      - run: npm ci
+        working-directory: templates/backend
+      - run: npm run check
+        working-directory: templates/backend
+        env:
+          COVERAGE_DIRECTORY: ${{ runner.temp }}/backend-coverage
+      - run: npm run pack:release
+      - run: npm run test:package -- --verify-backend
+      - run: npm audit --audit-level=moderate
+      - run: npm audit --audit-level=moderate
+        working-directory: templates/backend
+  containers:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: "24.22.2"
+      - run: npm ci
+        working-directory: templates/backend
+      - run: npm run test:containers
+        working-directory: templates/backend
+      - run: docker build --target runtime -t backend-scan:ci .
+        working-directory: templates/backend
+      - run: docker save -o api-image.tar backend-scan:ci
+      - run: docker run --rm -v "${{ github.workspace }}:/scan:ro" aquasec/trivy:0.76.1 image --input /scan/api-image.tar --severity HIGH,CRITICAL --exit-code 1

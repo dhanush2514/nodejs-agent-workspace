@@ -1,0 +1,32 @@
+log_format safe '$request_id $request_method $status $request_time';
+error_log /dev/stderr crit;
+resolver 127.0.0.11 valid=10s ipv6=off;
+server {
+    listen 8080;
+    server_name ${SERVER_NAME};
+    access_log /dev/stdout safe;
+    return 308 https://${SERVER_NAME}$request_uri;
+}
+server {
+    listen 8443 ssl;
+    server_name ${SERVER_NAME};
+    ssl_certificate /etc/nginx/tls/fullchain.pem;
+    ssl_certificate_key /etc/nginx/tls/private.key;
+    ssl_protocols TLSv1.2 TLSv1.3;
+    server_tokens off;
+    access_log /dev/stdout safe;
+    client_max_body_size 64k;
+    add_header Strict-Transport-Security "max-age=31536000" always;
+    location / {
+        set $backend api:3000;
+        proxy_pass http://$backend;
+        proxy_set_header Host ${SERVER_NAME};
+        proxy_set_header X-Forwarded-For $remote_addr;
+        proxy_set_header X-Forwarded-Proto https;
+        proxy_set_header X-Forwarded-Host ${SERVER_NAME};
+        proxy_set_header Forwarded "";
+        proxy_read_timeout 30s;
+        proxy_connect_timeout 5s;
+        proxy_send_timeout 30s;
+    }
+}

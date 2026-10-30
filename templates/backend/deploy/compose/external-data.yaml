@@ -1,0 +1,7 @@
+services:
+  api:
+    environment:
+      DATA_HOSTING: external
+  migrate:
+    environment:
+      DATA_HOSTING: external

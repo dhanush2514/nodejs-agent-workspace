@@ -1,0 +1,8 @@
+services:
+  api:
+    secrets: [database-ca]
+  migrate:
+    secrets: [database-ca]
+secrets:
+  database-ca:
+    file: ${DATABASE_CA_FILE:?Set DATABASE_CA_FILE for the approved database certificate}

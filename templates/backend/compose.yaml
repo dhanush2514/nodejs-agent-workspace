@@ -1,0 +1,35 @@
+name: __PROJECT_NAME__
+services:
+  api:
+    build:
+      context: .
+      target: runtime
+    init: true
+    stop_grace_period: 25s
+    networks: [application]
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    logging:
+      driver: json-file
+      options: { max-size: "10m", max-file: "3" }
+  migrate:
+    build:
+      context: .
+      target: migration
+    networks: [application]
+    restart: "no"
+  nginx:
+    image: nginx:1.30.6-alpine3.24
+    networks: [application]
+    depends_on:
+      api:
+        condition: service_healthy
+    logging:
+      driver: json-file
+      options: { max-size: "10m", max-file: "3" }
+networks:
+  application:
+    ipam:
+      config:
+        - subnet: ${APPLICATION_SUBNET:-172.28.0.0/24}

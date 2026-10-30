@@ -1,0 +1,6 @@
+CREATE TABLE "notes" (
+  "id" UUID NOT NULL,
+  "title" VARCHAR(120) NOT NULL,
+  "created_at" TIMESTAMPTZ(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT "notes_pkey" PRIMARY KEY ("id")
+);

@@ -1,0 +1,30 @@
+{
+  "name": "create-node-backend",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Internal requirement-first TypeScript backend generator",
+  "type": "module",
+  "bin": { "create-node-backend": "dist/cli.js" },
+  "engines": { "node": ">=24 <25" },
+  "files": ["dist", "bundle", "doc", "README.md"],
+  "scripts": {
+    "build": "tsc && node scripts/bundle.mjs",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --coverage",
+    "check": "npm run typecheck && npm test",
+    "pack:release": "npm run build && node scripts/release.mjs",
+    "test:package": "node scripts/test-package.mjs",
+    "format": "prettier --write src tests scripts customizations doc README.md",
+    "format:check": "prettier --check src tests scripts customizations doc README.md"
+  },
+  "dependencies": { "tar": "7.5.22" },
+  "devDependencies": {
+    "@types/node": "22.19.15",
+    "@vitest/coverage-v8": "5.0.5",
+    "node": "24.22.2",
+    "prettier": "3.8.3",
+    "typescript": "5.9.3",
+    "vitest": "5.0.5",
+    "yaml": "2.9.1"
+  }
+}

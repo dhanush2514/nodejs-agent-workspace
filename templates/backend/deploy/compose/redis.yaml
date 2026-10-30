@@ -1,0 +1,15 @@
+services:
+  redis:
+    image: redis:7.4.12-bookworm
+    profiles: [redis]
+    command: ["redis-server", "--appendonly", "yes", "--maxmemory-policy", "noeviction"]
+    networks: [application]
+    volumes: [redis-data:/data]
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+volumes:
+  redis-data:

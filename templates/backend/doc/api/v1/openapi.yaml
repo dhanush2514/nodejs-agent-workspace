@@ -1,0 +1,346 @@
+openapi: 3.1.0
+info:
+  title: Backend API
+  version: 1.0.0
+  description: Protected sample endpoints are unavailable until an approved
+    authentication integration is implemented. No authentication scheme is
+    inferred.
+paths:
+  /api/v1/notes:
+    get:
+      summary: List sample notes in stable UUID order
+      x-authentication: required; provider is pending approval; starter denies all access
+      x-permission: notes:read
+      responses:
+        "200":
+          description: List sample notes in stable UUID order
+          content:
+            application/json:
+              schema:
+                $schema: https://json-schema.org/draft/2020-12/schema
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          format: uuid
+                          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+                        title:
+                          type: string
+                        createdAt:
+                          type: string
+                          format: date-time
+                          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
+                      required:
+                        - id
+                        - title
+                        - createdAt
+                      additionalProperties: false
+                  meta:
+                    type: object
+                    properties:
+                      nextCursor:
+                        anyOf:
+                          - type: string
+                            format: uuid
+                            pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+                          - type: "null"
+                    required:
+                      - nextCursor
+                    additionalProperties: false
+                required:
+                  - data
+                  - meta
+                additionalProperties: false
+              example:
+                data:
+                  - &a2
+                    id: 00000000-0000-4000-8000-000000000001
+                    title: Example note
+                    createdAt: 2026-01-01T00:00:00.000Z
+                meta:
+                  nextCursor: null
+        "400":
+          description: Problem Details (400)
+          content:
+            application/problem+json:
+              schema: &a1
+                type: object
+                required:
+                  - type
+                  - title
+                  - status
+                  - requestId
+                properties:
+                  type:
+                    type: string
+                  title:
+                    type: string
+                  status:
+                    type: integer
+                  requestId:
+                    type: string
+                    format: uuid
+        "401":
+          description: Problem Details (401)
+          content:
+            application/problem+json:
+              schema: *a1
+        "403":
+          description: Problem Details (403)
+          content:
+            application/problem+json:
+              schema: *a1
+        "404":
+          description: Problem Details (404)
+          content:
+            application/problem+json:
+              schema: *a1
+        "413":
+          description: Problem Details (413)
+          content:
+            application/problem+json:
+              schema: *a1
+        "500":
+          description: Problem Details (500)
+          content:
+            application/problem+json:
+              schema: *a1
+        "503":
+          description: Problem Details (503)
+          content:
+            application/problem+json:
+              schema: *a1
+      parameters:
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+        - in: query
+          name: cursor
+          schema:
+            type: string
+            format: uuid
+    post:
+      summary: Create a sample note
+      x-authentication: required; provider is pending approval; starter denies all access
+      x-permission: notes:write
+      responses:
+        "201":
+          description: Create a sample note
+          content:
+            application/json:
+              schema:
+                $schema: https://json-schema.org/draft/2020-12/schema
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        format: uuid
+                        pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+                      title:
+                        type: string
+                      createdAt:
+                        type: string
+                        format: date-time
+                        pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
+                    required:
+                      - id
+                      - title
+                      - createdAt
+                    additionalProperties: false
+                required:
+                  - data
+                additionalProperties: false
+              example:
+                data: *a2
+        "400":
+          description: Problem Details (400)
+          content:
+            application/problem+json:
+              schema: *a1
+        "401":
+          description: Problem Details (401)
+          content:
+            application/problem+json:
+              schema: *a1
+        "403":
+          description: Problem Details (403)
+          content:
+            application/problem+json:
+              schema: *a1
+        "404":
+          description: Problem Details (404)
+          content:
+            application/problem+json:
+              schema: *a1
+        "413":
+          description: Problem Details (413)
+          content:
+            application/problem+json:
+              schema: *a1
+        "500":
+          description: Problem Details (500)
+          content:
+            application/problem+json:
+              schema: *a1
+        "503":
+          description: Problem Details (503)
+          content:
+            application/problem+json:
+              schema: *a1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $schema: https://json-schema.org/draft/2020-12/schema
+              type: object
+              properties:
+                title:
+                  type: string
+                  minLength: 1
+                  maxLength: 120
+              required:
+                - title
+              additionalProperties: false
+            example:
+              title: Example note
+  /health/live:
+    get:
+      summary: Process liveness
+      x-authentication: public
+      x-permission: null
+      responses:
+        "200":
+          description: Process liveness
+          content:
+            application/json:
+              schema:
+                $schema: https://json-schema.org/draft/2020-12/schema
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      status:
+                        type: string
+                        const: ok
+                    required:
+                      - status
+                    additionalProperties: false
+                required:
+                  - data
+                additionalProperties: false
+              example:
+                data:
+                  status: ok
+        "400":
+          description: Problem Details (400)
+          content:
+            application/problem+json:
+              schema: *a1
+        "401":
+          description: Problem Details (401)
+          content:
+            application/problem+json:
+              schema: *a1
+        "403":
+          description: Problem Details (403)
+          content:
+            application/problem+json:
+              schema: *a1
+        "404":
+          description: Problem Details (404)
+          content:
+            application/problem+json:
+              schema: *a1
+        "413":
+          description: Problem Details (413)
+          content:
+            application/problem+json:
+              schema: *a1
+        "500":
+          description: Problem Details (500)
+          content:
+            application/problem+json:
+              schema: *a1
+        "503":
+          description: Problem Details (503)
+          content:
+            application/problem+json:
+              schema: *a1
+  /health/ready:
+    get:
+      summary: Database readiness
+      x-authentication: public
+      x-permission: null
+      responses:
+        "200":
+          description: Database readiness
+          content:
+            application/json:
+              schema:
+                $schema: https://json-schema.org/draft/2020-12/schema
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      status:
+                        type: string
+                        const: ready
+                    required:
+                      - status
+                    additionalProperties: false
+                required:
+                  - data
+                additionalProperties: false
+              example:
+                data:
+                  status: ready
+        "400":
+          description: Problem Details (400)
+          content:
+            application/problem+json:
+              schema: *a1
+        "401":
+          description: Problem Details (401)
+          content:
+            application/problem+json:
+              schema: *a1
+        "403":
+          description: Problem Details (403)
+          content:
+            application/problem+json:
+              schema: *a1
+        "404":
+          description: Problem Details (404)
+          content:
+            application/problem+json:
+              schema: *a1
+        "413":
+          description: Problem Details (413)
+          content:
+            application/problem+json:
+              schema: *a1
+        "500":
+          description: Problem Details (500)
+          content:
+            application/problem+json:
+              schema: *a1
+        "503":
+          description: Problem Details (503)
+          content:
+            application/problem+json:
+              schema: *a1

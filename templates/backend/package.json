@@ -1,0 +1,57 @@
+{
+  "name": "backend-template",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=24 <25" },
+  "scripts": {
+    "dev": "tsx watch src/bootstrap/server.ts",
+    "build": "prisma generate && tsc",
+    "start": "node dist/bootstrap/server.js",
+    "typecheck": "prisma generate && tsc --noEmit",
+    "test": "vitest run --coverage",
+    "test:integration": "vitest run --config vitest.integration.config.ts",
+    "lint": "eslint src tests",
+    "format": "prettier --write src tests scripts doc",
+    "format:check": "prettier --check src tests scripts doc",
+    "check:architecture": "node scripts/architecture.mjs",
+    "check:docs": "tsx scripts/contracts.ts --check && node scripts/docs.mjs",
+    "docs:generate": "tsx scripts/contracts.ts",
+    "check:drift": "node scripts/drift.mjs",
+    "check": "npm run typecheck && npm run lint && npm run check:architecture && npm test && npm run check:docs",
+    "db:generate": "prisma generate",
+    "db:migrate": "node scripts/migrate.mjs",
+    "deploy:preflight": "node scripts/preflight.mjs",
+    "test:containers": "node scripts/container-smoke.mjs"
+  },
+  "dependencies": {
+    "@opentelemetry/api": "1.10.0",
+    "@opentelemetry/exporter-trace-otlp-http": "0.300.0",
+    "@opentelemetry/sdk-node": "0.300.0",
+    "@prisma/client": "6.19.3",
+    "express": "5.3.0",
+    "helmet": "8.1.0",
+    "pino": "10.4.0",
+    "zod": "4.6.7"
+  },
+  "devDependencies": {
+    "@eslint/js": "10.0.1",
+    "@types/express": "5.0.6",
+    "@types/node": "22.19.15",
+    "@types/supertest": "6.0.3",
+    "@vitest/coverage-v8": "5.0.5",
+    "eslint": "10.13.0",
+    "prettier": "3.8.3",
+    "prisma": "6.19.3",
+    "supertest": "7.2.2",
+    "tsx": "4.21.0",
+    "typescript": "5.9.3",
+    "typescript-eslint": "8.57.0",
+    "vitest": "5.0.5",
+    "yaml": "2.9.1"
+  },
+  "overrides": {
+    "@prisma/config": { "deepmerge-ts": "8.0.2" },
+    "esbuild": "0.28.2"
+  }
+}

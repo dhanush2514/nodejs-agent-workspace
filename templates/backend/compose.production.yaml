@@ -1,0 +1,39 @@
+services:
+  api:
+    image: ${APP_IMAGE:?Set immutable APP_IMAGE}
+    pull_policy: always
+    environment:
+      NODE_ENV: production
+      DATABASE_URL_FILE: /run/secrets/database-url
+      TRUST_PROXY: ${APPLICATION_SUBNET:?Set explicit APPLICATION_SUBNET}
+    secrets: [database-url]
+    restart: unless-stopped
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    tmpfs: ["/tmp"]
+    mem_limit: ${API_MEMORY:-512m}
+    cpus: ${API_CPUS:-1}
+  migrate:
+    image: ${MIGRATION_IMAGE:?Set matching immutable MIGRATION_IMAGE}
+    pull_policy: always
+    environment:
+      NODE_ENV: production
+      DATABASE_URL_FILE: /run/secrets/database-url
+    secrets: [database-url]
+  nginx:
+    ports: ["80:8080", "443:8443"]
+    environment:
+      SERVER_NAME: ${SERVER_NAME:?Set SERVER_NAME}
+      NGINX_ENVSUBST_FILTER: "^SERVER_NAME$"
+    volumes:
+      - ./deploy/nginx/production.conf.template:/etc/nginx/templates/default.conf.template:ro
+      - ${TLS_CERT_FILE:?Set TLS_CERT_FILE}:/etc/nginx/tls/fullchain.pem:ro
+      - ${TLS_KEY_FILE:?Set TLS_KEY_FILE}:/etc/nginx/tls/private.key:ro
+    restart: unless-stopped
+    mem_limit: 128m
+    cpus: 0.5
+    security_opt: ["no-new-privileges:true"]
+secrets:
+  database-url:
+    file: ${DATABASE_URL_FILE:?Set DATABASE_URL_FILE}
